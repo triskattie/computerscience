@@ -1,5 +1,8 @@
 """
-
+Naam: PRIVACY
+Programma: priem.py
+Werking: Dit stuk code test of een ingevoerd getal een priemgetal is. 
+Hierbij gaan we ervan uit dat een niet-priemgetal altijd bestaat uit 2 delen, waarbij een van de delen groter moet zijn dan de wortel van het geheel.
 """
 import math
 from gedeelde_functies import verkrijg_nummer

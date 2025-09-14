@@ -1,3 +1,9 @@
+"""
+Naam: PRIVACY
+Programma: verven.py
+Werking: Dit stuk code helpt de gebruiker met het beslissen van hoeveel emmers verf ze moeten kopen.
+"""
+
 import math
 from gedeelde_functies import verkrijg_nummer
 
