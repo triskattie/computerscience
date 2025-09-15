@@ -4,7 +4,8 @@ Programma: gedeelde_functies.py
 Werking: In dit bestand staan alle functies die meerdere keren worden gebruikt in de verschillende opdrachten.
 """
 
-def verkrijg_nummer(min_toegestaan: bool, decimalen_toegestaan: bool):
+# Functie voor het verkrijgen van een nummer van een gebruiker met typfout detectie
+def verkrijg_nummer(min_toegestaan: bool = True, decimalen_toegestaan: bool = True): # Min-getallen en komma-getallen zijn standaard toegestaan, behalve als ze expliciet worden verboden
   while True:
     n = input("") # Ontvangt een combinatie van tekens van de gebruiker
     n = n.replace(",", ".") # Verander een komma in een punt
@@ -14,6 +15,7 @@ def verkrijg_nummer(min_toegestaan: bool, decimalen_toegestaan: bool):
 
     if decimalen_toegestaan == False and "." in n:
       print("Komma-getallen zijn niet toegestaan")
+      continue
 
     # Gaat elk apart teken door en haalt de nummers eruit
     punt = False

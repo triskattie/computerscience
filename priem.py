@@ -11,7 +11,7 @@ def main():
   while True:
     priem = True
     print("Welk nummer wil je testen?")
-    n = verkrijg_nummer(min_toegestaan=True)
+    n = verkrijg_nummer(decimalen_toegestaan=False)
     if n <= 1:
       print("Geen priem")
       continue 
