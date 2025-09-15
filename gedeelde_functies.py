@@ -4,13 +4,16 @@ Programma: gedeelde_functies.py
 Werking: In dit bestand staan alle functies die meerdere keren worden gebruikt in de verschillende opdrachten.
 """
 
-def verkrijg_nummer(min_toegestaan: bool = True):
+def verkrijg_nummer(min_toegestaan: bool, decimalen_toegestaan: bool):
   while True:
     n = input("") # Ontvangt een combinatie van tekens van de gebruiker
     n = n.replace(",", ".") # Verander een komma in een punt
     if not n: # Als er niks wordt ingevuld
       print("Vul iets in")
       continue
+
+    if decimalen_toegestaan == False and "." in n:
+      print("Komma-getallen zijn niet toegestaan")
 
     # Gaat elk apart teken door en haalt de nummers eruit
     punt = False
@@ -27,12 +30,15 @@ def verkrijg_nummer(min_toegestaan: bool = True):
     if finished_letters in ["", "-", ".", "-."]:
       print("Geen nummers gedetecteerd, probeer opnieuw")
       continue
-
-    try:
-      getal = float(finished_letters)
+    
+    try: 
+      getal = int(finished_letters)
     except ValueError:
-      print("Geen geldig nummer, probeer opnieuw.")
-      continue
+      try:
+        getal = float(finished_letters)
+      except ValueError:
+        print("Geen geldig nummer, probeer opnieuw.")
+        continue
 
     if not min_toegestaan and getal < 0:
       print("Het kan helaas geen negatief getal zijn.")
