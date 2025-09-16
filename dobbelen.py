@@ -25,10 +25,21 @@ def start():
 def initialiseer_spelers(n):
     scores = {}
     for i in range(n):
-        scores[f"Speler {n + 1}"] = 0
+        scores[f"Speler {i + 1}"] = 0
+    return scores
 
-def check():
-    pass
+def check(dice1, dice2, result: int = 0):
+    result += dice1 + dice2
+    if dice1 == 6 and dice2 == 6:
+        a = input("Je hebt geluk! Je mag nog een keer dobbelen, druk op enter om te dobbelen.")
+        dice1 = random.randint(1, 6)
+        dice2 = random.randint(1, 6)
+        print(f"Je hebt {dice1} en {dice2} gerold!")
+        result = check(dice1, dice2, result)
+    return result
+        
+
+
 
 def beurt():
     beurt_keuze = inquirer.select(
@@ -36,17 +47,24 @@ def beurt():
         choices=["Dobbelen", "Challenge"],
     ).execute()
     if beurt_keuze == "Dobbelen":
-        # HIER VERDER
+        dice1 = random.randint(1, 6)
+        dice2 = random.randint(1, 6)
+        print(f"Je hebt {dice1} en {dice2} gerold!")
+        final_result = check(dice1, dice2)
+        return final_result
 
 def loop(spelers):
-    pass
+    for speler in spelers:
+        print(f"{speler} is nu aan de beurt!")
+        spelers[speler] += beurt()
+    return spelers
 
 def race_modus(spelers, spel_modus):
-    doel = spel_modus.strip()[-1]
+    doel = int(spel_modus.split()[-1])
     scores = initialiseer_spelers(spelers)
-    while max(scores) < doel:
+    while max(scores.values()) < doel:
         scores = loop(scores)
-    winnaar = max(scores)
+    winnaar = max(scores, key=scores.get)
     return winnaar
 
 def rondes_modus():
@@ -57,7 +75,8 @@ def main():
     while True:
         spelers, spel_modus = start()
         if spel_modus.split()[0] == "Race":
-            race_modus(spelers, spel_modus)
+            winnaar = race_modus(spelers, spel_modus)
+            print(f"Gefeliciteerd {winnaar}, je hebt gewonnen!")
         
         if not spel_modus.split()[0].isalpha():
             rondes_modus()
