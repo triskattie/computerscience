@@ -9,13 +9,19 @@ def rol_dobbelsteen(hoeveelheid_stenen):
     return uitslag
 
 def print_scorebord(scores):
-    print("SCOREBORD")
+    print("\n\n\nSCOREBORD")
     for speler in scores:
         print(f"{speler}: {scores[speler]}")
 
 def start():
     print("""Welkom bij mijn dobbelspel!\nMet hoeveel mensen ben je? """)
-    spelers = verkrijg_nummer(min_toegestaan=False, decimalen_toegestaan=False)
+    while True:
+        spelers = verkrijg_nummer(min_toegestaan=False, decimalen_toegestaan=False)
+        if spelers <= 1:
+            print("Je kan dit helaas nog niet in je eentje spelen.")
+            continue
+        break
+
     spel_modus = inquirer.select(
         message="Welke spelmodus wil je gebruiken?",
         choices=["Race naar 50", "Race naar 100", "5 rondes", "10 rondes"],
@@ -25,7 +31,13 @@ def start():
 def initialiseer_spelers(n):
     scores = {}
     for i in range(n):
-        scores[f"Speler {i + 1}"] = 0
+        while True:
+            naam = input(f"Speler {i + 1}, wat is jouw naam?")
+            if naam == "" or naam in scores:
+                print("Naam niet beschikbaar, probeer opnieuw.")
+                continue
+            break
+        scores[naam] = 0
     return scores
 
 def check(dice1, dice2, result: int = 0):
@@ -41,7 +53,7 @@ def check(dice1, dice2, result: int = 0):
 
 
 
-def beurt():
+def beurt(spelers, actieve_speler):
     beurt_keuze = inquirer.select(
         message="Welke actie wil je doen?",
         choices=["Dobbelen", "Challenge"],
@@ -51,12 +63,23 @@ def beurt():
         dice2 = random.randint(1, 6)
         print(f"Je hebt {dice1} en {dice2} gerold!")
         final_result = check(dice1, dice2)
-        return final_result
+        spelers[actieve_speler] += final_result
+        return spelers
+    if beurt_keuze == "Challenge":
+        alle_spelers = list(spelers.keys())
+        alle_spelers.remove(actieve_speler)
+        speler_keuzes = alle_spelers
+        speler_keuze = inquirer.select(
+            message="Welke speler wil je uitdagen?",
+            choices=speler_keuzes,
+        ).execute()
+        print(speler_keuze)
 
 def loop(spelers):
     for speler in spelers:
-        print(f"{speler} is nu aan de beurt!")
-        spelers[speler] += beurt()
+        print(f"\n\n{speler} is nu aan de beurt!")
+        spelers = beurt(spelers, speler)
+    print_scorebord(scores=spelers)
     return spelers
 
 def race_modus(spelers, spel_modus):
