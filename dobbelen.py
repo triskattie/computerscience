@@ -43,7 +43,7 @@ def initialiseer_spelers(n):
 def check(dice1, dice2, result: int = 0):
     result += dice1 + dice2
     if dice1 == 6 and dice2 == 6:
-        a = input("Je hebt geluk! Je mag nog een keer dobbelen, druk op enter om te dobbelen.")
+        input("Je hebt geluk! Je mag nog een keer dobbelen, druk op enter om te dobbelen.")
         dice1 = random.randint(1, 6)
         dice2 = random.randint(1, 6)
         print(f"Je hebt {dice1} en {dice2} gerold!")
