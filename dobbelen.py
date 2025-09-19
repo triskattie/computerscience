@@ -59,13 +59,13 @@ def beurt(spelers, actieve_speler):
         choices=["Dobbelen", "Challenge"],
     ).execute()
     if beurt_keuze == "Dobbelen":
-        dice1 = random.randint(1, 6)
-        dice2 = random.randint(1, 6)
-        print(f"Je hebt {dice1} en {dice2} gerold!")
-        final_result = check(dice1, dice2)
+        dobbelsteen1 = random.randint(1, 6)
+        dobbelsteen2 = random.randint(1, 6)
+        print(f"Je hebt {dobbelsteen1} en {dobbelsteen2} gerold!")
+        final_result = check(dobbelsteen1, dobbelsteen2)
         spelers[actieve_speler] += final_result
         return spelers
-    if beurt_keuze == "Challenge":
+    else: #Wanneer challenge is gekozen
         alle_spelers = list(spelers.keys())
         alle_spelers.remove(actieve_speler)
         speler_keuzes = alle_spelers
@@ -73,7 +73,31 @@ def beurt(spelers, actieve_speler):
             message="Welke speler wil je uitdagen?",
             choices=speler_keuzes,
         ).execute()
-        print(speler_keuze)
+        input(f"{actieve_speler}, druk op enter om te dobbelen.")
+        dobbelsteen1 = random.randint(1, 6)
+        dobbelsteen2 = random.randint(1, 6)
+        total1 = check(dobbelsteen1, dobbelsteen2)
+        print(f"Je hebt {dobbelsteen1} en {dobbelsteen2} gerold!")
+        input(f"{speler_keuze}, druk op enter om te dobbelen.")
+        dobbelsteen3 = random.randint(1, 6)
+        dobbelsteen4 = random.randint(1, 6)
+        total2 = check(dobbelsteen3, dobbelsteen4)
+        print(f"Je hebt {dobbelsteen3} en {dobbelsteen4} gerold!")
+        total = total1 + total2
+        if total1 > total2:
+            print(f"{actieve_speler} heeft {total} verdiend!")
+            spelers[actieve_speler] += total
+        elif total2 > total1:
+            print(f"{speler_keuze} heeft {total} verdiend!")
+            spelers[speler_keuze] += total
+        else:
+            print(f"{actieve_speler} heeft {total1} verdiend en {speler_keuze} heeft {total2} verdiend!")
+            spelers[actieve_speler] += total1
+            spelers[speler_keuze] += total2
+        return spelers
+
+
+
 
 def loop(spelers):
     for speler in spelers:
