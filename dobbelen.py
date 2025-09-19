@@ -1,6 +1,9 @@
 import random
 from gedeelde_functies import verkrijg_nummer
-from InquirerPy import inquirer
+try:
+    from InquirerPy import inquirer
+except ImportError:
+    inquirer = None
 
 def rol_dobbelsteen(hoeveelheid_stenen):
     uitslag = []
@@ -13,6 +16,22 @@ def print_scorebord(scores):
     for speler in scores:
         print(f"{speler}: {scores[speler]}")
 
+def verkrijg_modus():
+    while True:
+        try:
+            gebruiker_input = int(input("""Welke spelmodus wil je gebruiken? (1-4)
+            1. Race naar 50
+            2. Race naar 100
+            3. 5 rondes
+            4. 10 rondes"""))
+        except ValueError:
+            print("Je moet een nummer invullen, probeer opnieuw.")
+            continue
+        if gebruiker_input > 4 or gebruiker_input < 1:
+            print("Ongeldig nummer")
+            continue
+        return f"{'Race naar 50' if gebruiker_input == 1 else 'race naar 100' if gebruiker_input == 2 else '5 rondes' if gebruiker_input == 3 else '10 rondes'}"
+
 def start():
     print("""Welkom bij mijn dobbelspel!\nMet hoeveel mensen ben je? """)
     while True:
@@ -22,10 +41,13 @@ def start():
             continue
         break
 
-    spel_modus = inquirer.select(
-        message="Welke spelmodus wil je gebruiken?",
-        choices=["Race naar 50", "Race naar 100", "5 rondes", "10 rondes"],
-    ).execute()
+    if inquirer is not None:
+        spel_modus = inquirer.select(
+            message="Welke spelmodus wil je gebruiken?",
+            choices=["Race naar 50", "Race naar 100", "5 rondes", "10 rondes"],
+        ).execute()
+    else:
+        spel_modus = verkrijg_modus()
     return spelers, spel_modus
 
 def initialiseer_spelers(n):
