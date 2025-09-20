@@ -11,8 +11,8 @@ def rol_dobbelsteen(hoeveelheid_stenen):
         uitslag.append(random.randint(1, 6))
     return uitslag
 
-def print_scorebord(scores):
-    print("\n\n\nSCOREBORD")
+def print_scorebord(scores, r):
+    print(f"\n\n\nSCOREBORD RONDE {r + 1}")
     for speler in scores:
         print(f"{speler}: {scores[speler]}")
 
@@ -154,28 +154,29 @@ def beurt(spelers, actieve_speler):
 
 
 
-def loop(spelers):
+def loop(spelers, r):
+    print_scorebord(spelers, r)
     for speler in spelers:
         print(f"\n\n{speler} is nu aan de beurt!")
         spelers = beurt(spelers, speler)
-    print_scorebord(scores=spelers)
     return spelers
 
 def race_modus(spelers, spel_modus):
     doel = int(spel_modus.split()[-1])
     scores = initialiseer_spelers(spelers)
+    r = 0
     while max(scores.values()) < doel:
-        scores = loop(scores)
+        scores = loop(scores, r)
+        r += 1
     winnaar = max(scores, key=scores.get)
     return winnaar
 
-def rondes_modus(round_amount):
-    scores = initialiseer_spelers(round_amount)
-    for round in round_amount:
-        scores = loop(scores)
-
-    # HIER MOET CODE KOMEN VOOR DE RONDES MODUS
-    pass
+def rondes_modus(round_amount, spelers):
+    scores = initialiseer_spelers(spelers)
+    for r in range(round_amount):
+        scores = loop(scores, r)
+    winnaar = max(scores, key=scores.get)
+    return winnaar
 
 def main():
     while True:
@@ -185,8 +186,9 @@ def main():
             print(f"Gefeliciteerd {winnaar}, je hebt gewonnen!")
         
         if not spel_modus.split()[0].isalpha():
-            round_amount = spel_modus.split()[0]
-            rondes_modus(round_amount)
+            round_amount = int(spel_modus.split()[0])
+            winnaar = rondes_modus(round_amount, spelers)
+            print(f"Gefeliciteerd {winnaar}, je hebt gewonnen!")
 
         
 
