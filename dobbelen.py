@@ -1,3 +1,11 @@
+"""
+Naam: PRIVACY
+Programma: dobbelen.py
+Werking: Dit programma is een spelletje waarbij de gebruiker een doel in kan stellen en vervolgens met 2 of meer spelers
+gaat dobbelen tot het doel bereikt is. Het programma werkt het best met de module "InquirerPy" die te installeren is met
+"pip install inquirerpy" in een terminal. Het kan ook gespeeld worden zonder.
+"""
+
 import random
 from gedeelde_functies import verkrijg_nummer
 try:
@@ -5,16 +13,14 @@ try:
 except ImportError:
     inquirer = None
 
-def rol_dobbelsteen(hoeveelheid_stenen):
-    uitslag = []
-    for i in range(hoeveelheid_stenen):
-        uitslag.append(random.randint(1, 6))
-    return uitslag
-
+# Print het scorebord met inputs scores en ronde nummer
 def print_scorebord(scores, r : int = None):
     print(f"\n\n\nSCOREBORD {f'RONDE {r + 1}' if r else ''}")
-    for speler in scores:
-        print(f"{speler}: {scores[speler]}")
+    # Sorteert de scores door eerst een tuple te maken met (key, value) en dan telkens de value te pakken. Reversed
+    # zodat het aflopend is.
+    sorted_scores = dict(sorted(scores.items(), key=lambda x: x[1], reverse=True))
+    for speler in sorted_scores:
+        print(f"{speler}: {sorted_scores[speler]}")
 
 def verkrijg_modus():
     if inquirer is not None:
@@ -38,7 +44,7 @@ def verkrijg_modus():
             continue
         return f"{'Race naar 50' if gebruiker_input == 1 else 'race naar 100' if gebruiker_input == 2 else '5 rondes' if gebruiker_input == 3 else '10 rondes'}"
 
-def start():
+def intro():
     print("""Welkom bij mijn dobbelspel!\nMet hoeveel mensen ben je?""")
     while True:
         spelers = verkrijg_nummer(min_toegestaan=False, decimalen_toegestaan=False)
@@ -55,7 +61,7 @@ def initialiseer_spelers(n):
     for i in range(n):
         while True:
             naam = input(f"Speler {i + 1}, wat is jouw naam? ")
-            if naam == "" or naam in scores:
+            if naam == "" or naam in scores: #Als de gebruiker niets invult of een naam die al bestaat, invult
                 print("Naam niet beschikbaar, probeer opnieuw.")
                 continue
             break
@@ -183,7 +189,7 @@ def rondes_modus(round_amount, scores):
 
 def main():
     while True:
-        scores, spel_modus = start()
+        scores, spel_modus = intro()
         if spel_modus.split()[0] == "Race":
             winnaar, scores = race_modus(scores, spel_modus)
             print(f"Gefeliciteerd {winnaar}, je hebt gewonnen!")
