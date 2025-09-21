@@ -11,8 +11,8 @@ def rol_dobbelsteen(hoeveelheid_stenen):
         uitslag.append(random.randint(1, 6))
     return uitslag
 
-def print_scorebord(scores, r):
-    print(f"\n\n\nSCOREBORD RONDE {r + 1}")
+def print_scorebord(scores, r : int = None):
+    print(f"\n\n\nSCOREBORD {f'RONDE {r + 1}' if r else ''}")
     for speler in scores:
         print(f"{speler}: {scores[speler]}")
 
@@ -84,26 +84,28 @@ def verkrijg_beurt_keuze():
         try:
             beurt_keuze = int(input("""Welke actie wil je doen? (1 of 2)
 1. Dobbelen
-2. Challenge"""))
+2. Challenge
+"""))
         except ValueError:
             print("Ongeldig nummer")
             continue
         if beurt_keuze < 1 or beurt_keuze > 2:
             print("Ongeldig nummer")
             continue
-        return f"{'dobbelen' if beurt_keuze == 1 else 'challenge'}"
+        print(beurt_keuze)
+        return f"{'Dobbelen' if beurt_keuze == 1 else 'Challenge'}"
 
-def beurt(spelers, actieve_speler):
+def beurt(scores, actieve_speler):
     beurt_keuze = verkrijg_beurt_keuze()
     if beurt_keuze == "Dobbelen":
         dobbelsteen1 = random.randint(1, 6)
         dobbelsteen2 = random.randint(1, 6)
         print(f"Je hebt {dobbelsteen1} en {dobbelsteen2} gerold!")
         final_result = check(dobbelsteen1, dobbelsteen2)
-        spelers[actieve_speler] += final_result
-        return spelers
+        scores[actieve_speler] += final_result
+        return scores
     else: #Wanneer challenge is gekozen
-        alle_spelers = list(spelers.keys())
+        alle_spelers = list(scores.keys())
         alle_spelers.remove(actieve_speler)
         speler_keuzes = alle_spelers
         if inquirer is not None:
@@ -126,6 +128,7 @@ def beurt(spelers, actieve_speler):
                 if speler_keuze < 1 or speler_keuze > len(speler_keuzes):
                     print("Ongeldig nummer")
                     continue
+                break
 
             speler_keuze = speler_keuzes[speler_keuze - 1]
         input(f"{actieve_speler}, druk op enter om te dobbelen.")
@@ -141,54 +144,56 @@ def beurt(spelers, actieve_speler):
         total = total1 + total2
         if total1 > total2:
             print(f"{actieve_speler} heeft {total} verdiend!")
-            spelers[actieve_speler] += total
+            scores[actieve_speler] += total
         elif total2 > total1:
             print(f"{speler_keuze} heeft {total} verdiend!")
-            spelers[speler_keuze] += total
+            scores[speler_keuze] += total
         else:
             print(f"{actieve_speler} heeft {total1} verdiend en {speler_keuze} heeft {total2} verdiend!")
-            spelers[actieve_speler] += total1
-            spelers[speler_keuze] += total2
-        return spelers
+            scores[actieve_speler] += total1
+            scores[speler_keuze] += total2
+        return scores
 
 
 
 
-def loop(spelers, r):
-    print_scorebord(spelers, r)
-    for speler in spelers:
+def loop(scores, r):
+    print_scorebord(scores, r)
+    for speler in scores:
         print(f"\n\n{speler} is nu aan de beurt!")
-        spelers = beurt(spelers, speler)
-    return spelers
+        scores = beurt(scores, speler)
+    return scores
 
-def race_modus(spelers, spel_modus):
+def race_modus(scores, spel_modus):
     doel = int(spel_modus.split()[-1])
-    scores = initialiseer_spelers(spelers)
+    scores = initialiseer_spelers(scores)
     r = 0
     while max(scores.values()) < doel:
         scores = loop(scores, r)
         r += 1
     winnaar = max(scores, key=scores.get)
-    return winnaar
+    return winnaar, scores
 
-def rondes_modus(round_amount, spelers):
-    scores = initialiseer_spelers(spelers)
+def rondes_modus(round_amount, scores):
+    scores = initialiseer_spelers(scores)
     for r in range(round_amount):
         scores = loop(scores, r)
     winnaar = max(scores, key=scores.get)
-    return winnaar
+    return winnaar, scores
 
 def main():
     while True:
-        spelers, spel_modus = start()
+        scores, spel_modus = start()
         if spel_modus.split()[0] == "Race":
-            winnaar = race_modus(spelers, spel_modus)
+            winnaar, scores = race_modus(scores, spel_modus)
             print(f"Gefeliciteerd {winnaar}, je hebt gewonnen!")
+            print_scorebord(scores)
         
         if not spel_modus.split()[0].isalpha():
             round_amount = int(spel_modus.split()[0])
-            winnaar = rondes_modus(round_amount, spelers)
+            winnaar, scores = rondes_modus(round_amount, scores)
             print(f"Gefeliciteerd {winnaar}, je hebt gewonnen!")
+            print_scorebord(scores)
 
         
 
