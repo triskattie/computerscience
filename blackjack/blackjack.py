@@ -2,6 +2,7 @@ import hashlib
 import os
 import json
 from json import JSONDecodeError
+import time
 
 from gedeelde_functies import verkrijg_nummer
 import random
@@ -73,24 +74,68 @@ def betting(limit):
             continue
         return amount
 
-def beurt_keuze(player_cards, points):
+def beurt_keuze(player_cards, points, bet):
     if len(player_cards) == 2:
         double = True
-        if player_cards[0] == player_cards[1]:
-            split_possible = True
+    else:
+        double = False
+    choice_string = "\n1. Hit\n2. Stand"
+    amount_of_possibilities = 2
+    if double:
+        amount_of_possibilities += 1
+        choice_string += "\n3. Double"
+    while True:
+        player_choice = input(f"Which option would you like to choose?{choice_string} ")
+        try:
+            player_choice = int(player_choice)
+        except ValueError:
+            print("Please enter a number.")
+            continue
+        if player_choice > amount_of_possibilities:
+            print("Invalid input, please try again.")
+            continue
+        break
+    return "hit" if player_choice == 1 else "stand" if player_choice == 2 else "double"
 
-def print_cards(computer_cards, player_cards):
-    computer_cards_string = "  ".join(computer_cards)
+def get_value(cards):
+    value = 0
+    for card in cards:
+        try:
+            value += int(card)
+        except ValueError:
+            if card == "J":
+                value += 10
+            elif card == "Q":
+                value += 10
+            elif card == "K":
+                value += 10
+            elif card == "A":
+                value += 11
+    if value > 21 and "A" in cards:
+        value -= 10
+    return value
+
+
+
+def print_cards(computer_cards, player_cards, first: bool = True):
+    if first:
+        computer_cards_string = "  ".join(computer_cards[0])
+        computer_cards_string += "  CLOSED"
+        computer_cards_string += f"  ({get_value(computer_cards[0])})"
+    else:
+        computer_cards_string = "  ".join(computer_cards)
+        computer_cards_string += f"  ({get_value(computer_cards)})"
+
     print("COMPUTER CARDS")
     print(computer_cards_string)
     player_cards_string = "  ".join(player_cards)
+    player_cards_string += f"  ({get_value(player_cards)})"
     print("PLAYER CARDS")
     print(player_cards_string)
-    while True:
 
 
-def game_round(username, points):
-    cards = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "Joker"]
+def game_round(username, points, bet):
+    cards = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
     computer_cards = []
     for i in range(2):
         computer_cards.append(random.choice(cards))
@@ -98,16 +143,48 @@ def game_round(username, points):
     for i in range(2):
         player_cards.append(random.choice(cards))
 
-    print_cards(computer_cards, player_cards)
-    return
+
+    while True:
+        print_cards(computer_cards, player_cards)
+        if get_value(computer_cards) == 21 or get_value(player_cards) == 21:
+            break
+        keuze = beurt_keuze(player_cards, points, bet)
+        if keuze == "hit":
+            player_cards.append(random.choice(cards))
+            if get_value(player_cards) < 21:
+                continue
+        elif keuze == "stand":
+            done = True
+        elif keuze == "double":
+            bet *= 2
+            player_cards.append(random.choice(cards))
+            done = True
+        while get_value(computer_cards) < 16:
+            computer_cards.append(random.choice(cards))
+            print_cards(computer_cards, player_cards, first = False)
+        if get_value(player_cards) > 21 or get_value(computer_cards) == 21 or get_value(player_cards) < get_value(computer_cards):
+            return points - bet
+        if get_value(player_cards) == 21:
+            return points + bet * 1.5
+        if get_value(player_cards) > get_value(computer_cards):
+            return points + bet
+        if get_value(player_cards) == get_value(computer_cards):
+            return points
+
+
+
+
+
 
 
 def main():
     username, points = user_selection()
     while True:
+        print(f"You have {points} points.")
         bet = betting(points)
-        points = game_round(username, points)
-        save_data(points)
+        points = game_round(username, points, bet)
+        data["Balances"][username] = points
+        save_data(data)
 
 
 if __name__ == "__main__":
