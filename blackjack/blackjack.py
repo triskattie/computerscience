@@ -12,15 +12,22 @@ def save_data(data):
         json.dump(data, f, indent=4)
 
 data_path = os.path.join(os.path.dirname(__file__), "data.json")
-try:
-    with open(data_path, 'r') as f:
-        data = json.load(f)
-except JSONDecodeError:
+if not os.path.exists(data_path):
     data = {
         "Logins": {},
         "Balances": {}
     }
     save_data(data)
+else:
+    try:
+        with open(data_path, 'r') as f:
+            data = json.load(f)
+    except JSONDecodeError:
+        data = {
+            "Logins": {},
+            "Balances": {}
+        }
+        save_data(data)
 
 
 
