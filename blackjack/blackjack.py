@@ -142,22 +142,48 @@ def print_cards(computer_cards, player_cards, first: bool = True):
 
 
 def game_round(username, points, bet):
-    cards = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+    cards = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "Joker"]
     computer_cards = []
     for i in range(2):
-        computer_cards.append(random.choice(cards))
+        new_card = random.choice(cards)
+        if new_card == "Joker":
+            new_card = "10"
+        computer_cards.append(new_card)
     player_cards = []
     for i in range(2):
-        player_cards.append(random.choice(cards))
+        new_card = random.choice(cards)
+        if new_card == "Joker":
+            print("Your new card is a joker, you may now pick a number between 1 and 10.")
+            while True:
+                number = verkrijg_nummer(min_toegestaan=False, decimalen_toegestaan=False)
+                if number > 10:
+                    print("Smaller than 10.")
+                    continue
+                break
+            new_card = str(number)
+        player_cards.append(new_card)
 
 
     while True:
         print_cards(computer_cards, player_cards)
         if get_value(computer_cards) == 21 or get_value(player_cards) == 21:
-            break
-        keuze = beurt_keuze(player_cards, points, bet)
+            skip = True
+            keuze = ""
+        if not skip:
+            keuze = beurt_keuze(player_cards, points, bet)
         if keuze == "hit":
-            player_cards.append(random.choice(cards))
+            new_card = random.choice(cards)
+            if new_card == "Joker":
+                print("Your new card is a joker, you may now pick a number between 1 and 10.")
+                while True:
+                    number = verkrijg_nummer(min_toegestaan=False, decimalen_toegestaan=False)
+                    if number > 10:
+                        print("Smaller than 10.")
+                        continue
+                    break
+                new_card = str(number)
+
+            player_cards.append(new_card)
             if get_value(player_cards) < 21:
                 continue
         elif keuze == "stand":
@@ -166,13 +192,23 @@ def game_round(username, points, bet):
             bet *= 2
             player_cards.append(random.choice(cards))
             done = True
-        while get_value(computer_cards) < 16:
-            computer_cards.append(random.choice(cards))
-            print_cards(computer_cards, player_cards, first = False)
-        if get_value(player_cards) > 21 or get_value(computer_cards) == 21 or get_value(player_cards) < get_value(computer_cards):
-            return points - bet
+        if not skip:
+            while get_value(computer_cards) < 16:
+                new_card = random.choice(cards)
+                if new_card == "Joker":
+                    if get_value(computer_cards) <= 11:
+                        new_card = "10"
+                    else:
+                        new_card = 21 - get_value(computer_cards)
+                computer_cards.append(new_card)
+                print_cards(computer_cards, player_cards, first = False)
+        print_cards(computer_cards, player_cards, first = False)
         if get_value(player_cards) == 21:
             return points + bet * 1.5
+        if get_value(computer_cards) > 21:
+            return points + bet
+        if get_value(player_cards) > 21 or get_value(computer_cards) == 21 or get_value(player_cards) < get_value(computer_cards):
+            return points - bet
         if get_value(player_cards) > get_value(computer_cards):
             return points + bet
         if get_value(player_cards) == get_value(computer_cards):
