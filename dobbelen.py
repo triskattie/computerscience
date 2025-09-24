@@ -3,7 +3,8 @@ Naam: PRIVACY
 Programma: dobbelen.py
 Werking: Dit programma is een spelletje waarbij de gebruiker een doel in kan stellen en vervolgens met 2 of meer spelers
 gaat dobbelen tot het doel bereikt is. Het programma werkt het best met de module "InquirerPy" die te installeren is met
-"pip install inquirerpy" in een terminal. Het kan ook gespeeld worden zonder.
+"pip install inquirerpy" in een terminal. Het kan ook gespeeld worden zonder deze module. Als je opslag wil besparen kun
+je nadat je klaar bent de module weer verwijderen met "pip uninstall inquirerpy".
 """
 
 import random
@@ -16,19 +17,22 @@ except ImportError:
 # Print het scorebord met inputs scores en ronde nummer
 def print_scorebord(scores, r : int = None):
     print(f"\n\n\nSCOREBORD {f'RONDE {r + 1}' if r else ''}")
-    # Sorteert de scores door eerst een tuple te maken met (key, value) en dan telkens de value te pakken. Reversed
-    # zodat het aflopend is.
+
+    # Sorteert de scores door eerst een tuple te maken met (key, value) en dan telkens de value te pakken.
+    # Reversed zodat het aflopend is.
     sorted_scores = dict(sorted(scores.items(), key=lambda x: x[1], reverse=True))
     for speler in sorted_scores:
         print(f"{speler}: {sorted_scores[speler]}")
 
 def verkrijg_modus():
-    if inquirer is not None:
+    if inquirer is not None: # Als de externe module geïnstalleerd is gebruikt hij de module
         spel_modus = inquirer.select(
             message="Welke spelmodus wil je gebruiken?",
             choices=["Race naar 50", "Race naar 100", "5 rondes", "10 rondes"],
         ).execute()
         return spel_modus
+
+    # Als de externe module niet geïnstalleerd is gebruikt hij een normale input
     while True:
         try:
             gebruiker_input = int(input("""Welke spelmodus wil je gebruiken? (1-4)
@@ -111,9 +115,11 @@ def beurt(scores, actieve_speler):
         scores[actieve_speler] += final_result
         return scores
     else: #Wanneer challenge is gekozen
+        #Creer een lijst van tegenstanders die gekozen kunnen worden
         alle_spelers = list(scores.keys())
         alle_spelers.remove(actieve_speler)
         speler_keuzes = alle_spelers
+
         if inquirer is not None:
             speler_keuze = inquirer.select(
                 message="Welke speler wil je uitdagen?",

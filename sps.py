@@ -28,7 +28,7 @@ def main():
         print(f"{computer_score} - {speler_score}")
         computer_keuze = random.choice(keuzes)
 
-        # while True loop om ervoor te zorgen dat de gebruiker een juiste input geeft
+        # while True loop om ervoor te zorgen dat de gebruiker een correcte input geeft
         while True:
             speler_keuze = input("steen, papier, schaar? ").lower()
             if speler_keuze not in keuzes:
