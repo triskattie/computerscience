@@ -4,6 +4,11 @@ import json
 from json import JSONDecodeError
 import time
 
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from gedeelde_functies import verkrijg_nummer
 import random
 
@@ -166,6 +171,7 @@ def game_round(username, points, bet):
 
     while True:
         print_cards(computer_cards, player_cards)
+        skip = False
         if get_value(computer_cards) == 21 or get_value(player_cards) == 21:
             skip = True
             keuze = ""
@@ -193,7 +199,7 @@ def game_round(username, points, bet):
             player_cards.append(random.choice(cards))
             done = True
         if not skip:
-            while get_value(computer_cards) < 16:
+            while get_value(computer_cards) < 17:
                 new_card = random.choice(cards)
                 if new_card == "Joker":
                     if get_value(computer_cards) <= 11:
@@ -213,11 +219,6 @@ def game_round(username, points, bet):
             return points + bet
         if get_value(player_cards) == get_value(computer_cards):
             return points
-
-
-
-
-
 
 
 def main():
